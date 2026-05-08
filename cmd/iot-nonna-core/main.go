@@ -2,10 +2,15 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/chiaf1/iot-nonna-core/internal/config"
 	"github.com/chiaf1/iot-nonna-core/internal/db"
+	"github.com/chiaf1/iot-nonna-core/internal/handler"
+	"github.com/chiaf1/iot-nonna-core/internal/repository"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const CONFIG_PATH = "./config.yaml"
@@ -29,10 +34,24 @@ func main() {
 
 	// 2. Connet to db
 	// DB connection pool creation
-	_, err = db.NewPgPool(conf.DB)
+	dbPool, err := db.NewPgPool(conf.DB)
 	if err != nil {
 		log.Fatalf("Error opening connection to db: %v", err)
 	}
 	log.Println("Connection established with db")
 
+	// 3. Creating the repo and handler structures
+	repo := repository.NewRepo(dbPool, conf.DB.Query_timeout_read, conf.DB.Query_timeout_write)
+	h := handler.NewHandler(repo)
+	log.Println("Repo and Handler created, starting web server...")
+
+	// 4. Chi router creation
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello World!"))
+	})
+	r.Get("/health", h.HandleHealth)
+
+	http.ListenAndServe(":3000", r)
 }
