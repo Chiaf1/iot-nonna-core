@@ -52,6 +52,7 @@ func main() {
 		w.Write([]byte("Hello World!"))
 	})
 	r.Get("/health", h.HandleHealth)
+	r.Get("/rooms", h.HandleRooms)
 
 	http.ListenAndServe(":3000", r)
 }
