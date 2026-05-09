@@ -40,19 +40,25 @@ func main() {
 	}
 	log.Println("Connection established with db")
 
-	// 3. Lounch migration of db if enabled
+	// 3. Launch migration of db if enabled
 	if os.Getenv("RUN_MIGRATIONS") == "true" {
 		if err := db.RunMigrations(conf.DB.DbURL); err != nil {
 			log.Fatal(err)
 		}
 	}
+	// 4. Launch seeding of db if enabled
+	if os.Getenv("RUN_SEEDING") == "true" {
+		if err := db.RunSeeding(dbPool, conf.DB.Query_timeout_read); err != nil {
+			log.Fatal(err)
+		}
+	}
 
-	// 3. Creating the repo and handler structures
+	// 5. Creating the repo and handler structures
 	repo := repository.NewRepo(dbPool, conf.DB.Query_timeout_read, conf.DB.Query_timeout_write)
 	h := handler.NewHandler(repo)
 	log.Println("Repo and Handler created, starting web server...")
 
-	// 4. Chi router creation
+	// 6. Chi router creation
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
