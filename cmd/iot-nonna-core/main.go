@@ -9,8 +9,7 @@ import (
 	"github.com/chiaf1/iot-nonna-core/internal/db"
 	"github.com/chiaf1/iot-nonna-core/internal/handler"
 	"github.com/chiaf1/iot-nonna-core/internal/repository"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/chiaf1/iot-nonna-core/internal/router"
 )
 
 const CONFIG_PATH = "./config.yaml"
@@ -59,13 +58,6 @@ func main() {
 	log.Println("Repo and Handler created, starting web server...")
 
 	// 6. Chi router creation
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
-	r.Get("/health", h.HandleHealth)
-	r.Get("/rooms", h.HandleRooms)
-
+	r := router.Setup(h)
 	http.ListenAndServe(":3000", r)
 }

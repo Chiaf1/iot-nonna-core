@@ -7,7 +7,7 @@ import (
 )
 
 // Handler for retriving the list of all rooms
-func (h *Handler) HandleRooms(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
 	// 1. Fetch data
 	rooms, err := h.Repo.GetAllRooms()
 	if err != nil {
