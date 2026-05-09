@@ -59,5 +59,5 @@ func main() {
 
 	// 6. Chi router creation
 	r := router.Setup(h)
-	http.ListenAndServe(":3000", r)
+	log.Fatal(http.ListenAndServe(":3000", r))
 }
