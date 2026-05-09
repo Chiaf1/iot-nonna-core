@@ -2,13 +2,19 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
 // Handler for retriving the list of all rooms
 func (h *Handler) HandleRooms(w http.ResponseWriter, r *http.Request) {
 	// 1. Fetch data
-	rooms, _ := h.Repo.GetAllRooms()
+	rooms, err := h.Repo.GetAllRooms()
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		log.Printf("[handler][rooms] GetAllRooms error: %v", err)
+		return
+	}
 
 	// 2. Set header to tell client what type of content to expect
 	w.Header().Set("Content-Type", "application/json")

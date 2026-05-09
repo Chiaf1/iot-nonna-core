@@ -5,7 +5,7 @@ import "net/http"
 // Handle get health request
 func (h *Handler) HandleHealth(w http.ResponseWriter, r *http.Request) {
 	if err := h.Repo.GetDbHealth(); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Db offline"))
 		return
 	}
