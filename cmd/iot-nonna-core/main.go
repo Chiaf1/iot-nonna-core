@@ -40,6 +40,13 @@ func main() {
 	}
 	log.Println("Connection established with db")
 
+	// 3. Lounch migration of db if enabled
+	if os.Getenv("RUN_MIGRATIONS") == "true" {
+		if err := db.RunMigrations(conf.DB.DbURL); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	// 3. Creating the repo and handler structures
 	repo := repository.NewRepo(dbPool, conf.DB.Query_timeout_read, conf.DB.Query_timeout_write)
 	h := handler.NewHandler(repo)
