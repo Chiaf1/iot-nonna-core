@@ -15,15 +15,7 @@ func Setup(h *handler.Handler) *chi.Mux {
 
 	r.Get("/health", h.HandleHealth)
 
-	r.Route("/rooms", func(r chi.Router) {
-		r.Get("/", h.GetRooms)
-		r.Post("/", h.PostRoom)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", h.GetRoom)
-			r.Put("/", h.PutRoom)
-			r.Delete("/", h.DeleteRoom)
-		})
-	})
+	routeRooms(r, h)
 
 	return r
 }
