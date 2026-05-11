@@ -57,7 +57,7 @@ func (r *Repository) GetAllSensorType() ([]domain.Sensor_type, error) {
 	return Sensor_types, rows.Err()
 }
 
-// Get a list of all sensorsType
+// Get the sensor_type based on id
 func (r *Repository) GetSensorTypeById(id string) (*domain.Sensor_type, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
