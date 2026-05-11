@@ -6,7 +6,7 @@ import (
 )
 
 func routeSensorType(r *chi.Mux, h *handler.Handler) {
-	r.Route("/sensor_type", func(r chi.Router) {
+	r.Route("/sensor-types", func(r chi.Router) {
 		r.Get("/", h.GetSensorTypes)
 		r.Post("/", h.PostSensorType)
 		r.Route("/{id}", func(r chi.Router) {

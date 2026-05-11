@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type Sensor_type struct {
+type SensorType struct {
 	Id                string                      `json:"id"`
 	Code              string                      `json:"code"`
 	Topic             string                      `json:"topic"`
@@ -24,12 +24,12 @@ type ColumnSchemaType struct {
 	Type   string `json:"type" validate:"required,oneof=float int bool string"`
 }
 
-type Sensor_typeRequest struct {
+type SensorTypeRequest struct {
 	Code              string                      `json:"code" validate:"required"`
 	Topic             string                      `json:"topic" validate:"required,max=50"`
 	Description       *string                     `json:"description,omitempty"`
 	ReadingsTableName string                      `json:"readings_table_name" validate:"required"`
-	ColumnSchema      map[string]ColumnSchemaType `json:"column_schema" validate:"required,min=1"`
+	ColumnSchema      map[string]ColumnSchemaType `json:"column_schema" validate:"required,min=1,dive"`
 	ValueMapping      json.RawMessage             `json:"value_mapping,omitempty" validate:"omitempty,json"`
 	PayloadFormat     string                      `json:"payload_format" validate:"required,oneof=json raw"`
 	QosMqtt           *int16                      `json:"qos_mqtt,omitempty" validate:"omitempty,min=0,max=2"`
@@ -37,7 +37,7 @@ type Sensor_typeRequest struct {
 
 // Validation function for structure SensorTypeRequest
 func SensorTypeReqValidation(sl validator.StructLevel) {
-	s := sl.Current().Interface().(Sensor_typeRequest)
+	s := sl.Current().Interface().(SensorTypeRequest)
 
 	for k := range s.ColumnSchema {
 		if strings.TrimSpace(k) == "" {

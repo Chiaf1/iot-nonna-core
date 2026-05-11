@@ -6,7 +6,7 @@ import (
 )
 
 func routeDeviceType(r *chi.Mux, h *handler.Handler) {
-	r.Route("/device_type", func(r chi.Router) {
+	r.Route("/device-types", func(r chi.Router) {
 		r.Get("/", h.GetDeviceTypes)
 		r.Post("/", h.PostDeviceType)
 		r.Route("/{id}", func(r chi.Router) {

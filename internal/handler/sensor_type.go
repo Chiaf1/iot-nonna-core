@@ -1,13 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/chiaf1/iot-nonna-core/internal/domain"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/validator/v10"
 )
 
 // Handler for retriving the list of all sensor type
@@ -42,35 +40,20 @@ func (h *Handler) GetSensorType(w http.ResponseWriter, r *http.Request) {
 
 // Handler to create a new sensor type from json body
 func (h *Handler) PostSensorType(w http.ResponseWriter, r *http.Request) {
-	// 1. Decode JSON body
-	var req domain.Sensor_typeRequest
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+	// 1. Decode and validate JSON body
+	req, err := decodeAndValidate[domain.SensorTypeRequest](r, h.Validator)
+	if err != nil {
+		h.respondValidationError(w, err)
 		return
 	}
-	// 2. Validate values
-	if err := h.Validator.Struct(req); err != nil {
-		if verrs, ok := err.(validator.ValidationErrors); ok {
-			errors := make(map[string]string)
-			for _, v := range verrs {
-				errors[v.Field()] = v.Tag()
-			}
-			writeJson(w, http.StatusBadRequest, map[string]any{
-				"errors": errors,
-			})
-		}
-		return
-	}
-	// 3. Call the repo
+	// 2. Call the repo
 	st, err := h.Repo.CreateSensorType(req)
 	if err != nil {
 		log.Printf("[handler][CreateSensorType] %v", err)
 		http.Error(w, "internal server erro", http.StatusInternalServerError)
 		return
 	}
-	// 4. Respons with 201 created and the created room
+	// 3. Respons with 201 created and the created room
 	writeJson(w, http.StatusCreated, st)
 }
 
@@ -78,28 +61,13 @@ func (h *Handler) PostSensorType(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) PutSensorType(w http.ResponseWriter, r *http.Request) {
 	// 1. Retrieve id value from url
 	id := chi.URLParam(r, "id")
-	// 2. Decode JSON body
-	var req domain.Sensor_typeRequest
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+	// 2. Decode and validate JSON body
+	req, err := decodeAndValidate[domain.SensorTypeRequest](r, h.Validator)
+	if err != nil {
+		h.respondValidationError(w, err)
 		return
 	}
-	// 3. Validate values
-	if err := h.Validator.Struct(req); err != nil {
-		if verrs, ok := err.(validator.ValidationErrors); ok {
-			errors := make(map[string]string)
-			for _, v := range verrs {
-				errors[v.Field()] = v.Tag()
-			}
-			writeJson(w, http.StatusBadRequest, map[string]any{
-				"errors": errors,
-			})
-		}
-		return
-	}
-	// 4. Call the repo
+	// 3. Call the repo
 	st, err := h.Repo.UpdateSensorType(id, req)
 	if err != nil {
 		log.Printf("[handler][UpdateSensorType] %v", err)
@@ -110,7 +78,7 @@ func (h *Handler) PutSensorType(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "sensor_type not found", http.StatusNotFound)
 		return
 	}
-	// 5. Respons with 201 created and the created room
+	// 4. Respons with 201 created and the created room
 	writeJson(w, http.StatusOK, st)
 }
 

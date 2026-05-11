@@ -9,7 +9,7 @@ import (
 )
 
 // Get a slice of all device_type
-func (r *Repository) GetAllDeviceType() ([]domain.Device_type, error) {
+func (r *Repository) GetAllDeviceType() ([]domain.DeviceType, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
@@ -23,9 +23,9 @@ func (r *Repository) GetAllDeviceType() ([]domain.Device_type, error) {
 	defer rows.Close()
 
 	// 3. Scroll all rows and add them to the slice of sensor_type
-	var device_types []domain.Device_type
+	var device_types []domain.DeviceType
 	for rows.Next() {
-		var dt domain.Device_type
+		var dt domain.DeviceType
 		// Scan each row for column data
 		err := rows.Scan(
 			&dt.Id,
@@ -45,13 +45,13 @@ func (r *Repository) GetAllDeviceType() ([]domain.Device_type, error) {
 }
 
 // Get the device_type from id
-func (r *Repository) GetDeviceTypeById(id string) (*domain.Device_type, error) {
+func (r *Repository) GetDeviceTypeById(id string) (*domain.DeviceType, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
 
 	// 2. Create and lounch the query
-	var dt domain.Device_type
+	var dt domain.DeviceType
 	err := r.DbPool.QueryRow(ctx, `SELECT 
 	id, code, topic, description FROM device_type WHERE id = $1`, id).Scan(
 		&dt.Id,
@@ -72,11 +72,11 @@ func (r *Repository) GetDeviceTypeById(id string) (*domain.Device_type, error) {
 }
 
 // Create device_type and returns the device_type with id
-func (r *Repository) CreateDeviceType(newDt domain.Device_typeRequest) (*domain.Device_type, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
+func (r *Repository) CreateDeviceType(newDt domain.DeviceTypeRequest) (*domain.DeviceType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_write)
 	defer cancel()
 
-	var dt domain.Device_type
+	var dt domain.DeviceType
 	err := r.DbPool.QueryRow(ctx, `
 	INSERT INTO device_type (
 		code,
@@ -107,11 +107,11 @@ func (r *Repository) CreateDeviceType(newDt domain.Device_typeRequest) (*domain.
 }
 
 // Update device_type and return the new one
-func (r *Repository) UpdateDeviceType(id string, newDt domain.Device_typeRequest) (*domain.Device_type, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
+func (r *Repository) UpdateDeviceType(id string, newDt domain.DeviceTypeRequest) (*domain.DeviceType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_write)
 	defer cancel()
 
-	var dt domain.Device_type
+	var dt domain.DeviceType
 	err := r.DbPool.QueryRow(ctx, `
 	Update device_type 
 	SET 

@@ -10,7 +10,7 @@ import (
 )
 
 // Get a list of all sensorsType
-func (r *Repository) GetAllSensorType() ([]domain.Sensor_type, error) {
+func (r *Repository) GetAllSensorType() ([]domain.SensorType, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
@@ -25,9 +25,9 @@ func (r *Repository) GetAllSensorType() ([]domain.Sensor_type, error) {
 	defer rows.Close()
 
 	// 3. Scroll all rows and add them to the slice of sensor_type
-	var Sensor_types []domain.Sensor_type
+	var Sensor_types []domain.SensorType
 	for rows.Next() {
-		var st domain.Sensor_type
+		var st domain.SensorType
 		var rawColumnSchema json.RawMessage
 		// Scan each row for column data
 		err := rows.Scan(
@@ -58,13 +58,13 @@ func (r *Repository) GetAllSensorType() ([]domain.Sensor_type, error) {
 }
 
 // Get the sensor_type based on id
-func (r *Repository) GetSensorTypeById(id string) (*domain.Sensor_type, error) {
+func (r *Repository) GetSensorTypeById(id string) (*domain.SensorType, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
 
 	// 2. Create and lounch the query
-	var st domain.Sensor_type
+	var st domain.SensorType
 	var rawColumnSchema json.RawMessage
 	err := r.DbPool.QueryRow(ctx, `SELECT 
 	id, code, topic, description, readings_table_name, column_schema, value_mapping, payload_format, qos_mqtt 
@@ -97,8 +97,8 @@ func (r *Repository) GetSensorTypeById(id string) (*domain.Sensor_type, error) {
 }
 
 // Create sensortype and returns the sensortype with the id created by the db
-func (r *Repository) CreateSensorType(newSt domain.Sensor_typeRequest) (*domain.Sensor_type, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
+func (r *Repository) CreateSensorType(newSt domain.SensorTypeRequest) (*domain.SensorType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_write)
 	defer cancel()
 
 	// Marshal column schema to add
@@ -107,7 +107,7 @@ func (r *Repository) CreateSensorType(newSt domain.Sensor_typeRequest) (*domain.
 		return nil, err
 	}
 
-	var st domain.Sensor_type
+	var st domain.SensorType
 	var columnSchemaBytes_read json.RawMessage
 	err = r.DbPool.QueryRow(ctx, `
 	INSERT INTO sensor_type (
@@ -164,8 +164,8 @@ func (r *Repository) CreateSensorType(newSt domain.Sensor_typeRequest) (*domain.
 }
 
 // Update the sensor type and returns the updated sensor type
-func (r *Repository) UpdateSensorType(id string, newSt domain.Sensor_typeRequest) (*domain.Sensor_type, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
+func (r *Repository) UpdateSensorType(id string, newSt domain.SensorTypeRequest) (*domain.SensorType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_write)
 	defer cancel()
 
 	// Marshal column schema to add
@@ -174,7 +174,7 @@ func (r *Repository) UpdateSensorType(id string, newSt domain.Sensor_typeRequest
 		return nil, err
 	}
 
-	var st domain.Sensor_type
+	var st domain.SensorType
 	var columnSchemaBytes_read json.RawMessage
 	err = r.DbPool.QueryRow(ctx, `
 	Update sensor_type 
