@@ -4,16 +4,22 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/chiaf1/iot-nonna-core/internal/domain"
 	"github.com/chiaf1/iot-nonna-core/internal/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type Handler struct {
-	Repo *repository.Repository
+	Repo      *repository.Repository
+	Validator *validator.Validate
 }
 
 func NewHandler(repo *repository.Repository) *Handler {
+	validator := validator.New()
+	validator.RegisterStructValidation(domain.SensorTypeReqValidation, domain.Sensor_typeRequest{})
 	return &Handler{
-		Repo: repo,
+		Repo:      repo,
+		Validator: validator,
 	}
 }
 

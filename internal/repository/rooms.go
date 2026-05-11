@@ -4,16 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/chiaf1/iot-nonna-core/internal/domain"
 	"github.com/jackc/pgx/v5"
 )
 
-type Room struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
-
 // Query the database to retrive a list of all rooms
-func (r *Repository) GetAllRooms() ([]Room, error) {
+func (r *Repository) GetAllRooms() ([]domain.Room, error) {
 	// 1. Create context with timeout for query
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
@@ -26,7 +22,7 @@ func (r *Repository) GetAllRooms() ([]Room, error) {
 	defer rows.Close()
 
 	// 3. Scroll all raws and add them to the room slice
-	var rooms []Room
+	var rooms []domain.Room
 	for rows.Next() {
 		var (
 			id   string
@@ -38,7 +34,7 @@ func (r *Repository) GetAllRooms() ([]Room, error) {
 			return nil, err
 		}
 
-		rooms = append(rooms, Room{
+		rooms = append(rooms, domain.Room{
 			Id:   id,
 			Name: name,
 		})
@@ -49,11 +45,11 @@ func (r *Repository) GetAllRooms() ([]Room, error) {
 }
 
 // Get single room data by id
-func (r *Repository) GetRoomById(id string) (*Room, error) {
+func (r *Repository) GetRoomById(id string) (*domain.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
 
-	var room Room
+	var room domain.Room
 	err := r.DbPool.QueryRow(ctx,
 		`SELECT id, name FROM rooms WHERE id = $1`, id,
 	).Scan(&room.Id, &room.Name)
@@ -68,11 +64,11 @@ func (r *Repository) GetRoomById(id string) (*Room, error) {
 }
 
 // Create room and returns the room with the id created by the db
-func (r *Repository) CreateRoom(name string) (*Room, error) {
+func (r *Repository) CreateRoom(name string) (*domain.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
 
-	var room Room
+	var room domain.Room
 	err := r.DbPool.QueryRow(ctx,
 		`INSERT INTO rooms(name) VALUES ($1) RETURNING id, name`, name,
 	).Scan(&room.Id, &room.Name)
@@ -83,11 +79,11 @@ func (r *Repository) CreateRoom(name string) (*Room, error) {
 }
 
 // Update the name and returns the update room
-func (r *Repository) UpdateRoom(id, name string) (*Room, error) {
+func (r *Repository) UpdateRoom(id, name string) (*domain.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.QueryTimeout_read)
 	defer cancel()
 
-	var room Room
+	var room domain.Room
 	err := r.DbPool.QueryRow(ctx,
 		`UPDATE rooms SET name = $1 WHERE id = $2 RETURNING id, name`, name, id,
 	).Scan(&room.Id, &room.Name)

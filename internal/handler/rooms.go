@@ -5,13 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/chiaf1/iot-nonna-core/internal/domain"
 	"github.com/go-chi/chi/v5"
 )
-
-// Struct to read the body of the reuqest
-type RoomRequest struct {
-	Name string `json:"name"`
-}
 
 // Handler for retriving the list of all rooms
 func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +42,7 @@ func (h *Handler) GetRoom(w http.ResponseWriter, r *http.Request) {
 // Handler to create a new room from json body
 func (h *Handler) PostRoom(w http.ResponseWriter, r *http.Request) {
 	// 1. Decode JSON body
-	var req RoomRequest
+	var req domain.RoomRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
@@ -71,7 +67,7 @@ func (h *Handler) PostRoom(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) PutRoom(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	var req RoomRequest
+	var req domain.RoomRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid body request", http.StatusBadRequest)
 		return

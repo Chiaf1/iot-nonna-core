@@ -16,6 +16,7 @@ func Setup(h *handler.Handler) *chi.Mux {
 	r.Get("/health", h.HandleHealth)
 
 	routeRooms(r, h)
+	routeSensorType(r, h)
 
 	return r
 }
