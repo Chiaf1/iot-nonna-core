@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/chiaf1/iot-nonna-core/internal/config"
 	"github.com/chiaf1/iot-nonna-core/internal/db"
@@ -14,6 +18,11 @@ import (
 
 const CONFIG_PATH = "./config.yaml"
 
+// @title 			IOT nonna core API
+// @version 		1.0
+// @description 	API for management of IoT system database
+// @host			localhost:3030
+// @BasePath		/
 func main() {
 	confPath := os.Getenv("CONFIG_PATH")
 	if confPath == "" {
@@ -59,5 +68,35 @@ func main() {
 
 	// 6. Chi router creation
 	r := router.Setup(h)
-	log.Fatal(http.ListenAndServe(":3000", r))
+
+	// Creating an HTTP server to handle graceful shutdowns
+	srv := http.Server{
+		Addr:    ":3030",
+		Handler: r,
+	}
+
+	// Starting the server in a go routine
+	go func() {
+		log.Println("Server listening on :3030")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Listen error: %v", err)
+		}
+	}()
+
+	//Waiting for shutdown signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutdown signal received")
+
+	// Graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
+	}
+
+	log.Println("Server exited cleanly")
 }
