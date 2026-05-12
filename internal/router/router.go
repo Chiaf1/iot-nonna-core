@@ -19,6 +19,7 @@ func Setup(h *handler.Handler) *chi.Mux {
 	routeSensorType(r, h)
 	routeDeviceType(r, h)
 	routeDevices(r, h)
+	routeReadings(r, h)
 
 	return r
 }
