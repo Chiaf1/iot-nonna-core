@@ -15,6 +15,43 @@ definitions:
     - column
     - type
     type: object
+  domain.Device:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      device_type:
+        $ref: '#/definitions/domain.DeviceType'
+      id:
+        type: string
+      room:
+        $ref: '#/definitions/domain.Room'
+    type: object
+  domain.DeviceRequest:
+    properties:
+      code:
+        maxLength: 50
+        type: string
+      device_type_id:
+        type: string
+      room_id:
+        type: string
+    required:
+    - code
+    - device_type_id
+    type: object
+  domain.DeviceType:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      topic:
+        type: string
+    type: object
   domain.Room:
     properties:
       id:
@@ -97,6 +134,136 @@ info:
   title: IOT nonna core API
   version: "1.0"
 paths:
+  /devices:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Device'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all devices
+      tags:
+      - devices
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: device payload
+        in: body
+        name: device
+        required: true
+        schema:
+          $ref: '#/definitions/domain.DeviceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Device'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Add a device
+      tags:
+      - devices
+  /devices/{id}:
+    delete:
+      parameters:
+      - description: device id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: no content
+        "404":
+          description: device not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete device
+      tags:
+      - devices
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Device'
+        "404":
+          description: device not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Returns the device with specified id
+      tags:
+      - devices
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: device id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: device payload
+        in: body
+        name: device
+        required: true
+        schema:
+          $ref: '#/definitions/domain.DeviceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Device'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "404":
+          description: device not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Update device based on id
+      tags:
+      - devices
   /health:
     get:
       produces:
