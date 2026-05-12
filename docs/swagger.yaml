@@ -97,6 +97,26 @@ info:
   title: IOT nonna core API
   version: "1.0"
 paths:
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Db offline
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check connection with db
+      tags:
+      - health
   /rooms:
     get:
       produces:
