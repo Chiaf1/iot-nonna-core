@@ -141,3 +141,18 @@ Il seeding può essere:
 
 - eseguito manualmente
 - o all’avvio in ambienti non produttivi
+
+## API Documentation
+
+La documentazione interattiva è disponibile via Swagger UI all'endpoint:
+```
+GET /swagger/index.html
+```
+Permette di esplorare tutti gli endpoint, vedere i modelli di request/response
+e fare chiamate direttamente dal browser.
+
+Per rigenerare la documentazione dopo modifiche agli handler:
+
+```bash
+swag init -g cmd/iot-nonna-core/main.go
+```
