@@ -28,7 +28,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.DeviceType"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.DeviceType"
+                            }
                         }
                     },
                     "500": {
@@ -447,6 +450,9 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -507,7 +513,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "sesor id",
+                        "description": "sensor id",
                         "name": "sensorId",
                         "in": "path",
                         "required": true
@@ -558,6 +564,208 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/readings/dht/{deviceId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "readings"
+                ],
+                "summary": "Lists all dht readings of deiveceId in range from - to and limit number of lines",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "deviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "time stamp start query (default 24h ago)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "time stamp stop query (default now)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max number of lines (default 500)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.DhtReadings"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "input parameters not valid",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/readings/dht/{deviceId}/latest": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "readings"
+                ],
+                "summary": "Returns latest dht reading",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "deviceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.DhtReadings"
+                        }
+                    },
+                    "404": {
+                        "description": "latest dht reading not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/readings/status/{deviceId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "readings"
+                ],
+                "summary": "Lists all status readings of deiveceId in range from - to and limit number of lines",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "deviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "time stamp start query (default 24h ago)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "time stamp stop query (default now)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max number of lines (default 500)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.StatusReadings"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "input parameters not valid",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/readings/status/{deviceId}/latest": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "readings"
+                ],
+                "summary": "Returns latest status reading",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "deviceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.StatusReadings"
+                        }
+                    },
+                    "404": {
+                        "description": "latest status reading not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -1070,6 +1278,29 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.DhtReadings": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "humidity": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sensor_id": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.Room": {
             "type": "object",
             "properties": {
@@ -1167,6 +1398,26 @@ const docTemplate = `{
                 },
                 "value_mapping": {
                     "type": "object"
+                }
+            }
+        },
+        "domain.StatusReadings": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sensor_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "timestamp": {
+                    "type": "string"
                 }
             }
         },

@@ -72,6 +72,21 @@ definitions:
     - code
     - topic
     type: object
+  domain.DhtReadings:
+    properties:
+      device_id:
+        type: string
+      humidity:
+        type: number
+      id:
+        type: string
+      sensor_id:
+        type: string
+      temperature:
+        type: number
+      timestamp:
+        type: string
+    type: object
   domain.Room:
     properties:
       id:
@@ -140,6 +155,19 @@ definitions:
     - readings_table_name
     - topic
     type: object
+  domain.StatusReadings:
+    properties:
+      device_id:
+        type: string
+      id:
+        type: string
+      sensor_id:
+        type: string
+      status:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
   domain.ValidationErrorResponse:
     properties:
       errors:
@@ -162,7 +190,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.DeviceType'
+            items:
+              $ref: '#/definitions/domain.DeviceType'
+            type: array
         "500":
           description: internal server error
           schema:
@@ -437,6 +467,8 @@ paths:
       tags:
       - deviceSensors
     post:
+      consumes:
+      - application/json
       parameters:
       - description: device id
         in: path
@@ -473,7 +505,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: sesor id
+      - description: sensor id
         in: path
         name: sensorId
         required: true
@@ -512,6 +544,140 @@ paths:
       summary: Check connection with db
       tags:
       - health
+  /readings/dht/{deviceId}:
+    get:
+      parameters:
+      - description: device id
+        in: path
+        name: deviceId
+        required: true
+        type: string
+      - description: time stamp start query (default 24h ago)
+        in: query
+        name: from
+        type: string
+      - description: time stamp stop query (default now)
+        in: query
+        name: to
+        type: string
+      - description: max number of lines (default 500)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.DhtReadings'
+            type: array
+        "400":
+          description: input parameters not valid
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all dht readings of deiveceId in range from - to and limit number
+        of lines
+      tags:
+      - readings
+  /readings/dht/{deviceId}/latest:
+    get:
+      parameters:
+      - description: device id
+        in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DhtReadings'
+        "404":
+          description: latest dht reading not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Returns latest dht reading
+      tags:
+      - readings
+  /readings/status/{deviceId}:
+    get:
+      parameters:
+      - description: device id
+        in: path
+        name: deviceId
+        required: true
+        type: string
+      - description: time stamp start query (default 24h ago)
+        in: query
+        name: from
+        type: string
+      - description: time stamp stop query (default now)
+        in: query
+        name: to
+        type: string
+      - description: max number of lines (default 500)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.StatusReadings'
+            type: array
+        "400":
+          description: input parameters not valid
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all status readings of deiveceId in range from - to and limit
+        number of lines
+      tags:
+      - readings
+  /readings/status/{deviceId}/latest:
+    get:
+      parameters:
+      - description: device id
+        in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StatusReadings'
+        "404":
+          description: latest status reading not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Returns latest status reading
+      tags:
+      - readings
   /rooms:
     get:
       produces:
