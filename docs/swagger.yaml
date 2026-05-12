@@ -52,6 +52,19 @@ definitions:
       topic:
         type: string
     type: object
+  domain.DeviceTypeRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      topic:
+        maxLength: 50
+        type: string
+    required:
+    - code
+    - topic
+    type: object
   domain.Room:
     properties:
       id:
@@ -134,6 +147,134 @@ info:
   title: IOT nonna core API
   version: "1.0"
 paths:
+  /device-types:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DeviceType'
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all device types
+      tags:
+      - deviceType
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Device type payload
+        in: body
+        name: deviceType
+        required: true
+        schema:
+          $ref: '#/definitions/domain.DeviceTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.DeviceType'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Add device type
+      tags:
+      - deviceType
+  /device-types/{id}:
+    delete:
+      parameters:
+      - description: Device type id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: no content
+        "404":
+          description: device_type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete device type
+      tags:
+      - deviceType
+    get:
+      parameters:
+      - description: Device type id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DeviceType'
+        "404":
+          description: device_type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Returns the device type based on the id
+      tags:
+      - deviceType
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Device type id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Device type payload
+        in: body
+        name: deviceType
+        required: true
+        schema:
+          $ref: '#/definitions/domain.DeviceTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DeviceType'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "404":
+          description: device_type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Update device type
+      tags:
+      - deviceType
   /devices:
     get:
       produces:
