@@ -13,7 +13,7 @@ import (
 // @Summary				Lists all device types
 // @Tags				deviceType
 // @Produce				json
-// @Success				200	{object}	domain.DeviceType
+// @Success				200	{array}	domain.DeviceType
 // @Failure				500	{string}	string	"internal server error"
 // @Router				/device-types	[get]
 func (h *Handler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {

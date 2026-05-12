@@ -9,6 +9,14 @@ import (
 )
 
 // Get all sensors associated with device
+// GetDeviceSensors			godoc
+// @Summary					Lists all sensors of selected device
+// @Tags					deviceSensors
+// @Produce					json
+// @Param					id	path	string	true	"device id"
+// @Success					200	{array}	domain.SensorType
+// @Failure					500	{string}	string	"internal server error"
+// @Router					/devices/{id}/sensors	[get]
 func (h *Handler) GetDeviceSensors(w http.ResponseWriter, r *http.Request) {
 	// Retrieve id value from url
 	id := chi.URLParam(r, "id")
@@ -23,6 +31,17 @@ func (h *Handler) GetDeviceSensors(w http.ResponseWriter, r *http.Request) {
 }
 
 // Post sensor associated to a device
+// PostDeviceSensors			godoc
+// @Summary					Add sensor to device
+// @Tags					deviceSensors
+// @Accept					json
+// @Produce					json
+// @Param					id	path	string	true	"device id"
+// @Param					sensorId	body	domain.AssociateSensorRequest	true	"Associated sensor payload"
+// @Success					204	"status no content"
+// @Failure					400	{object}	domain.ValidationErrorResponse	"validation error"
+// @Failure					500	{string}	string	"internal server error"
+// @Router					/devices/{id}/sensors	[post]
 func (h *Handler) PostDeviceSensors(w http.ResponseWriter, r *http.Request) {
 	// Retrieve id value from url
 	deviceId := chi.URLParam(r, "id")
@@ -42,6 +61,15 @@ func (h *Handler) PostDeviceSensors(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent) // 204 succes, no body
 }
 
+// DeleteDeviceSensor			godoc
+// @Summary					Delete sensor from device
+// @Tags					deviceSensors
+// @Param					id	path	string	true	"device id"
+// @Param					sensorId	path	string	true	"sensor id"
+// @Success					204	"status no content"
+// @Failure					404	{string}	string	"sensors_devices not found"
+// @Failure					500	{string}	string	"internal server error"
+// @Router					/devices/{id}/sensors/{sensorId}	[delete]
 func (h *Handler) DeleteDeviceSensor(w http.ResponseWriter, r *http.Request) {
 	deviceId := chi.URLParam(r, "id")
 	sensorId := chi.URLParam(r, "sensorId")

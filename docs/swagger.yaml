@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  domain.AssociateSensorRequest:
+    properties:
+      sensor_id:
+        type: string
+    required:
+    - sensor_id
+    type: object
   domain.ColumnSchemaType:
     properties:
       column:
@@ -405,6 +412,86 @@ paths:
       summary: Update device based on id
       tags:
       - devices
+  /devices/{id}/sensors:
+    get:
+      parameters:
+      - description: device id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SensorType'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all sensors of selected device
+      tags:
+      - deviceSensors
+    post:
+      parameters:
+      - description: device id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Associated sensor payload
+        in: body
+        name: sensorId
+        required: true
+        schema:
+          $ref: '#/definitions/domain.AssociateSensorRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: status no content
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Add sensor to device
+      tags:
+      - deviceSensors
+  /devices/{id}/sensors/{sensorId}:
+    delete:
+      parameters:
+      - description: device id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: sesor id
+        in: path
+        name: sensorId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: status no content
+        "404":
+          description: sensors_devices not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete sensor from device
+      tags:
+      - deviceSensors
   /health:
     get:
       produces:

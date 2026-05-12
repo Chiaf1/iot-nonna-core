@@ -410,6 +410,128 @@ const docTemplate = `{
                 }
             }
         },
+        "/devices/{id}/sensors": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deviceSensors"
+                ],
+                "summary": "Lists all sensors of selected device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.SensorType"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deviceSensors"
+                ],
+                "summary": "Add sensor to device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Associated sensor payload",
+                        "name": "sensorId",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.AssociateSensorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "status no content"
+                    },
+                    "400": {
+                        "description": "validation error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices/{id}/sensors/{sensorId}": {
+            "delete": {
+                "tags": [
+                    "deviceSensors"
+                ],
+                "summary": "Delete sensor from device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sesor id",
+                        "name": "sensorId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "status no content"
+                    },
+                    "404": {
+                        "description": "sensors_devices not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "produces": [
@@ -841,6 +963,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.AssociateSensorRequest": {
+            "type": "object",
+            "required": [
+                "sensor_id"
+            ],
+            "properties": {
+                "sensor_id": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.ColumnSchemaType": {
             "type": "object",
             "required": [
