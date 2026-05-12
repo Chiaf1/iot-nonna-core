@@ -10,6 +10,13 @@ import (
 )
 
 // Handler for retriving the list of all rooms
+// GetRooms 	godoc
+// @summary		lists all rooms
+// @Tags		rooms
+// @Produce		json
+// @Success		200 {array}		domain.Room
+// @Failure		500	{string}	string	"internal server error"
+// @Router		/rooms	[get]
 func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
 	// 1. Fetch data
 	rooms, err := h.Repo.GetAllRooms()
@@ -22,6 +29,15 @@ func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler for retriving room by id in url
+// GetRoom		godoc
+// @Summary		returns the rooms with the specified id
+// @Tags		rooms
+// @Produce		json
+// @Param		id		path	string	true	"Room ID"
+// @Success		200		{object}	domain.Room
+// @Failure		404		{string}	string	"room not found"
+// @Failure		500		{string}	string	"internal server error"
+// @Router		/rooms/{id}	[get]
 func (h *Handler) GetRoom(w http.ResponseWriter, r *http.Request) {
 	// Retrieve id value from url
 	id := chi.URLParam(r, "id")
@@ -40,6 +56,16 @@ func (h *Handler) GetRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler to create a new room from json body
+// PostRoom		godoc
+// @Summary		Create a new room
+// @Tags		rooms
+// @Accept		json
+// @Produce		json
+// @Param		room	body	domain.RoomRequest	true	"Room payload"
+// @Success		201		{object}	domain.Room
+// @Failure		400		{string}	string	"invalid request body"
+// @Failure		500		{string}	string	"internal server error"
+// @Router		/rooms	[post]
 func (h *Handler) PostRoom(w http.ResponseWriter, r *http.Request) {
 	// 1. Decode JSON body
 	var req domain.RoomRequest
@@ -64,6 +90,18 @@ func (h *Handler) PostRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update room value based on the id as url param and new name in JSON body
+// PutRoom		godoc
+// @Summary		Update room
+// @Tags		rooms
+// @Accept		json
+// @Produce		json
+// @Param		id		path	string				true	"RoomId"
+// @Param		room	body	domain.RoomRequest	true	"Room payload"
+// @Success		200		{object}	domain.Room
+// @Failure		400		{string}	string	"invalid request body"
+// @Failure		404		{string}	string	"room not found"
+// @Failure		500		{string}	string	"internal server error"
+// @Router		/rooms/{id}	[put]
 func (h *Handler) PutRoom(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
@@ -91,6 +129,14 @@ func (h *Handler) PutRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete room based on id in url param
+// DeleteRoom		godoc
+// @Summary			Delete the room
+// @Tags			rooms
+// @Param			id		path	string	true	"Room ID"
+// @Success			204		"no content"
+// @Failure			404		{string}	string	"room not found"
+// @Failure			500		{string}	string	"internal server error"
+// @Router			/rooms/{id}	[delete]
 func (h *Handler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 

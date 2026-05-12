@@ -1,0 +1,152 @@
+basePath: /
+definitions:
+  domain.Room:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  domain.RoomRequest:
+    properties:
+      name:
+        type: string
+    type: object
+host: localhost:3030
+info:
+  contact: {}
+  description: API for management of IoT system database
+  title: IOT nonna core API
+  version: "1.0"
+paths:
+  /rooms:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Room'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: lists all rooms
+      tags:
+      - rooms
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Room payload
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Room'
+        "400":
+          description: invalid request body
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Create a new room
+      tags:
+      - rooms
+  /rooms/{id}:
+    delete:
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: no content
+        "404":
+          description: room not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete the room
+      tags:
+      - rooms
+    get:
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Room'
+        "404":
+          description: room not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: returns the rooms with the specified id
+      tags:
+      - rooms
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: RoomId
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Room payload
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Room'
+        "400":
+          description: invalid request body
+          schema:
+            type: string
+        "404":
+          description: room not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Update room
+      tags:
+      - rooms
+swagger: "2.0"

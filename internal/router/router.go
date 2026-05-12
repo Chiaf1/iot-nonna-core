@@ -20,6 +20,7 @@ func Setup(h *handler.Handler) *chi.Mux {
 	routeDeviceType(r, h)
 	routeDevices(r, h)
 	routeReadings(r, h)
+	routeSwagger(r, h)
 
 	return r
 }
