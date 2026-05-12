@@ -57,7 +57,9 @@ func (h *Handler) respondValidationError(w http.ResponseWriter, err error) {
 		for _, v := range verrs {
 			errs[v.Field()] = v.Tag()
 		}
-		writeJson(w, http.StatusBadRequest, map[string]any{"errors": errs})
+		writeJson(w, http.StatusBadRequest, domain.ValidationErrorResponse{
+			Errors: errs,
+		})
 		return
 	}
 	http.Error(w, err.Error(), http.StatusBadRequest)

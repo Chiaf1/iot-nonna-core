@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  domain.ColumnSchemaType:
+    properties:
+      column:
+        type: string
+      type:
+        enum:
+        - float
+        - int
+        - bool
+        - string
+        type: string
+    required:
+    - column
+    - type
+    type: object
   domain.Room:
     properties:
       id:
@@ -11,6 +26,69 @@ definitions:
     properties:
       name:
         type: string
+    type: object
+  domain.SensorType:
+    properties:
+      code:
+        type: string
+      column_schema:
+        additionalProperties:
+          $ref: '#/definitions/domain.ColumnSchemaType'
+        type: object
+      description:
+        type: string
+      id:
+        type: string
+      payload_format:
+        type: string
+      qos_mqtt:
+        type: integer
+      readings_table_name:
+        type: string
+      topic:
+        type: string
+      value_mapping:
+        type: object
+    type: object
+  domain.SensorTypeRequest:
+    properties:
+      code:
+        type: string
+      column_schema:
+        additionalProperties:
+          $ref: '#/definitions/domain.ColumnSchemaType'
+        type: object
+      description:
+        type: string
+      payload_format:
+        enum:
+        - json
+        - raw
+        type: string
+      qos_mqtt:
+        maximum: 2
+        minimum: 0
+        type: integer
+      readings_table_name:
+        type: string
+      topic:
+        maxLength: 50
+        type: string
+      value_mapping:
+        type: object
+    required:
+    - code
+    - column_schema
+    - payload_format
+    - readings_table_name
+    - topic
+    type: object
+  domain.ValidationErrorResponse:
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        type: object
     type: object
 host: localhost:3030
 info:
@@ -149,4 +227,134 @@ paths:
       summary: Update room
       tags:
       - rooms
+  /sensor-types:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SensorType'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Lists all sensor types
+      tags:
+      - sensorTypes
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Sensor type payload
+        in: body
+        name: sensorType
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SensorTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.SensorType'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Add new sensor type
+      tags:
+      - sensorTypes
+  /sensor-types/{id}:
+    delete:
+      parameters:
+      - description: Sensor type id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: no content
+        "404":
+          description: Sensor type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete sensor type based on id
+      tags:
+      - sensorTypes
+    get:
+      parameters:
+      - description: SensorType ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SensorType'
+        "404":
+          description: sensor_type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Returns sensor type with specified id
+      tags:
+      - sensorTypes
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: sensor type id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: sensor type payload
+        in: body
+        name: sensorType
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SensorTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SensorType'
+        "400":
+          description: validation error
+          schema:
+            $ref: '#/definitions/domain.ValidationErrorResponse'
+        "404":
+          description: sensor_type not found
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Update sensor type based on id
+      tags:
+      - sensorTypes
 swagger: "2.0"

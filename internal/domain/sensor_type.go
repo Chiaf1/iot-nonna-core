@@ -14,7 +14,7 @@ type SensorType struct {
 	Description       *string                     `json:"description,omitempty"`
 	ReadingsTableName string                      `json:"readings_table_name"`
 	ColumnSchema      map[string]ColumnSchemaType `json:"column_schema"`
-	ValueMapping      json.RawMessage             `json:"value_mapping,omitempty"`
+	ValueMapping      json.RawMessage             `json:"value_mapping,omitempty" swaggertype:"object"`
 	PayloadFormat     string                      `json:"payload_format"`
 	QosMqtt           *int16                      `json:"qos_mqtt,omitempty"`
 }
@@ -30,7 +30,7 @@ type SensorTypeRequest struct {
 	Description       *string                     `json:"description,omitempty"`
 	ReadingsTableName string                      `json:"readings_table_name" validate:"required"`
 	ColumnSchema      map[string]ColumnSchemaType `json:"column_schema" validate:"required,min=1,dive"`
-	ValueMapping      json.RawMessage             `json:"value_mapping,omitempty" validate:"omitempty,json"`
+	ValueMapping      json.RawMessage             `json:"value_mapping,omitempty" validate:"omitempty,json" swaggertype:"object"`
 	PayloadFormat     string                      `json:"payload_format" validate:"required,oneof=json raw"`
 	QosMqtt           *int16                      `json:"qos_mqtt,omitempty" validate:"omitempty,min=0,max=2"`
 }

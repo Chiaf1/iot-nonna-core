@@ -207,9 +207,229 @@
                     }
                 }
             }
+        },
+        "/sensor-types": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sensorTypes"
+                ],
+                "summary": "Lists all sensor types",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.SensorType"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sensorTypes"
+                ],
+                "summary": "Add new sensor type",
+                "parameters": [
+                    {
+                        "description": "Sensor type payload",
+                        "name": "sensorType",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.SensorTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.SensorType"
+                        }
+                    },
+                    "400": {
+                        "description": "validation error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/sensor-types/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sensorTypes"
+                ],
+                "summary": "Returns sensor type with specified id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "SensorType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.SensorType"
+                        }
+                    },
+                    "404": {
+                        "description": "sensor_type not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sensorTypes"
+                ],
+                "summary": "Update sensor type based on id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sensor type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "sensor type payload",
+                        "name": "sensorType",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.SensorTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.SensorType"
+                        }
+                    },
+                    "400": {
+                        "description": "validation error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ValidationErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "sensor_type not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "sensorTypes"
+                ],
+                "summary": "Delete sensor type based on id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sensor type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "no content"
+                    },
+                    "404": {
+                        "description": "Sensor type not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "domain.ColumnSchemaType": {
+            "type": "object",
+            "required": [
+                "column",
+                "type"
+            ],
+            "properties": {
+                "column": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "float",
+                        "int",
+                        "bool",
+                        "string"
+                    ]
+                }
+            }
+        },
         "domain.Room": {
             "type": "object",
             "properties": {
@@ -226,6 +446,98 @@
             "properties": {
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "domain.SensorType": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "column_schema": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.ColumnSchemaType"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "payload_format": {
+                    "type": "string"
+                },
+                "qos_mqtt": {
+                    "type": "integer"
+                },
+                "readings_table_name": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "value_mapping": {
+                    "type": "object"
+                }
+            }
+        },
+        "domain.SensorTypeRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "column_schema",
+                "payload_format",
+                "readings_table_name",
+                "topic"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "column_schema": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.ColumnSchemaType"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "payload_format": {
+                    "type": "string",
+                    "enum": [
+                        "json",
+                        "raw"
+                    ]
+                },
+                "qos_mqtt": {
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 0
+                },
+                "readings_table_name": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "value_mapping": {
+                    "type": "object"
+                }
+            }
+        },
+        "domain.ValidationErrorResponse": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 }
             }
         }
