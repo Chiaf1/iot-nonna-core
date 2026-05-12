@@ -11,13 +11,13 @@ import (
 // Handler get all devices
 func (h *Handler) GetDevices(w http.ResponseWriter, r *http.Request) {
 	// 1. Fetch data
-	dt, err := h.Repo.GetAllDevices()
+	d, err := h.Repo.GetAllDevices()
 	if err != nil {
 		log.Printf("[handler][GetAllDevices] %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	writeJson(w, http.StatusOK, dt)
+	writeJson(w, http.StatusOK, d)
 }
 
 // Handler get device by id in url
@@ -25,17 +25,17 @@ func (h *Handler) GetDevice(w http.ResponseWriter, r *http.Request) {
 	// Retrieve id value from url
 	id := chi.URLParam(r, "id")
 
-	dt, err := h.Repo.GetDeviceById(id)
+	d, err := h.Repo.GetDeviceById(id)
 	if err != nil {
 		log.Printf("[handler][GetDeviceById] %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	if dt == nil {
+	if d == nil {
 		http.Error(w, "device not found", http.StatusNotFound)
 		return
 	}
-	writeJson(w, http.StatusOK, dt)
+	writeJson(w, http.StatusOK, d)
 }
 
 // Handler post new device from json body
@@ -47,14 +47,14 @@ func (h *Handler) PostDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 2. Call the repo
-	st, err := h.Repo.CreateDevice(req)
+	d, err := h.Repo.CreateDevice(req)
 	if err != nil {
 		log.Printf("[handler][CreateDevice] %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 	// 3. Respons with 201 created and the created room
-	writeJson(w, http.StatusCreated, st)
+	writeJson(w, http.StatusCreated, d)
 }
 
 // Handler to put device from json body
@@ -68,18 +68,18 @@ func (h *Handler) PutDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 4. Call the repo
-	dt, err := h.Repo.UpdateDevice(id, req)
+	d, err := h.Repo.UpdateDevice(id, req)
 	if err != nil {
 		log.Printf("[handler][UpdateDevice] %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	if dt == nil {
+	if d == nil {
 		http.Error(w, "device not found", http.StatusNotFound)
 		return
 	}
 	// 5. Respons with 201 created and the created room
-	writeJson(w, http.StatusOK, dt)
+	writeJson(w, http.StatusOK, d)
 }
 
 // Delete device based on id in url param

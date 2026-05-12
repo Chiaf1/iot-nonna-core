@@ -13,6 +13,13 @@ func routeDevices(r *chi.Mux, h *handler.Handler) {
 			r.Get("/", h.GetDevice)
 			r.Put("/", h.PutDevice)
 			r.Delete("/", h.DeleteDevice)
+
+			// Sensors-devices sub resurce
+			r.Route("/sensors", func(r chi.Router) {
+				r.Get("/", h.GetDeviceSensors)
+				r.Post("/", h.PostDeviceSensors)
+				r.Delete("/{sensorId}", h.DeleteDeviceSensor)
+			})
 		})
 	})
 }
