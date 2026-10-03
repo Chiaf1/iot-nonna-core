@@ -1,157 +1,183 @@
-# Servizio **`iot-nonna-core`**
+# Service **`iot-nonna-core`**
 
-## Scopo generale
+> Part of the **iot-nonna** project. For the whole system and the Docker Compose deployment, see [iot-nonna-containers](https://github.com/Chiaf1/iot-nonna-containers).
 
-**`iot-nonna-core`** è il servizio centrale di dominio del sistema IoT “nonna”.  
-Ha la responsabilità di:
+## Purpose
 
-- **gestire il modello business IoT** (stanze, dispositivi, sensori, tipologie)
-- **esporre i dati raccolti** in forma chiara e consumabile
-- **nascondere la complessità del database** al resto del sistema
-- **fungere da punto di verità unico** per configurazione e lettura dei dati
+**`iot-nonna-core`** is the central domain service of the "nonna" IoT system.  
+It is responsible for:
 
-Non è un servizio di ingestione dati né di controllo attivo, ma **il cuore informativo e configurativo** su cui tutti gli altri servizi si appoggiano.
+- **managing the IoT business model** (rooms, devices, sensors, types)
+- **exposing the collected data** in a clear, consumable form
+- **hiding the complexity of the database** from the rest of the system
+- **acting as the single source of truth** for configuration and data reads
 
----
-
-## Responsabilità del servizio
-
-### ✅ Cosa **DEVE** fare
-1. **Provisioning e configurazione**
-    - Creazione e gestione di:
-        - rooms
-        - device_type
-        - sensor_type
-        - devices
-        - associazioni device ↔ sensori
-    - Applicazione di:
-        - validazioni
-        - vincoli logici
-        - regole di coerenza (es. un device deve avere un type valido)
-2. **Accesso semplificato ai dati**
-    - Esporre il contenuto del database in forma:
-        - leggibile
-        - strutturata
-        - stabile nel tempo
-    - Eliminare la necessità di usare pgAdmin o query manuali
-3. **Lettura dei dati storici**
-    - Fornire endpoint pensati per:
-        - dashboard
-        - grafici
-        - analisi temporali
-    - Incapsulare:
-        - filtri temporali
-        - aggregazioni
-        - downsampling
-    - Risultati pronti per il frontend (non “raw SQL”)
-4. **Stabilità del dominio**
-    - Essere il **contratto stabile** tra DB e consumer
-    - Permettere evoluzione dello schema DB senza rompere il frontend
+It is not a data ingestion service and not an active control service. It is **the information and configuration core** that all the other services rely on.
 
 ---
 
-## Scelte tecnologiche
-- **Linguaggio**: Go
-- **Stile API**: REST
-- **Router HTTP**: `chi`
+## Responsibilities
+
+### ✅ What it **MUST** do
+
+1. **Provisioning and configuration**
+   - Creating and managing:
+     - rooms
+     - device_type
+     - sensor_type
+     - devices
+     - device ↔ sensor associations
+   - Applying:
+     - validations
+     - logical constraints
+     - consistency rules (e.g. a device must have a valid type)
+2. **Simplified data access**
+   - Expose the contents of the database in a form that is:
+     - readable
+     - structured
+     - stable over time
+   - Remove the need for pgAdmin or manual queries
+3. **Reading historical data**
+   - Provide endpoints designed for:
+     - dashboards
+     - charts
+     - time-based analysis
+   - Wrap:
+     - time filters (`from`, `to`, `limit`)
+   - Return results ready for the frontend (not "raw SQL")
+4. **Domain stability**
+   - Be the **stable contract** between the DB and its consumers
+   - Allow the DB schema to evolve without breaking the frontend
+
+---
+
+## Technology choices
+
+- **Language**: Go
+- **API style**: REST
+- **HTTP router**: `chi`
 - **Database**: PostgreSQL
-- **Accesso DB**: driver nativo (`pgx`)
-- **Separazione ruoli DB**:
-    - `iot-nonna-ingest`: lettura metadata + scrittura readings
-    - `iot-nonna-core`: gestione tabelle business + lettura
+- **DB access**: native driver (`pgx`)
+- **DB role separation**:
+  - `iot-nonna-ingest`: reads metadata + writes readings
+  - `iot-nonna-core`: manages business tables + reads
 
-### Perché Go + chi
-- Go garantisce:
-    - performance prevedibili
-    - semplicità strutturale
-    - eccellente supporto a servizi backend di dominio
-- `chi`:
-    - minimalista
-    - basato su `net/http`
-    - non introduce magia o pattern artificiali
-    - favorisce architetture pulite e mantenibili nel tempo
+### Why Go + chi
+
+- Go gives:
+  - predictable performance
+  - structural simplicity
+  - excellent support for domain backend services
+- `chi` is:
+  - minimal
+  - built on `net/http`
+  - free of magic and artificial patterns
+  - good for clean, maintainable architectures over time
 
 ---
 
-## Struttura logica del servizio
+## Logical structure of the service
 
-Il servizio è **stratificato**, non “a handler grassi”.
+The service is **layered**, not built from "fat handlers".
 
-Concetti chiave (indipendenti dal codice):
+Key concepts (independent of the code):
 
 1. **HTTP layer**
-    
-    - parsing request
-    - status code
-    - serializzazione JSON
+   - request parsing
+   - status codes
+   - JSON serialization
+
 2. **Domain / Service layer**
-    
-    - regole di business
-    - validazioni logiche
-    - orchestrazione delle operazioni
+   - business rules
+   - logical validations
+   - orchestration of operations
+
 3. **Persistence layer**
-    
-    - query SQL
-    - accesso al DB
-    - nessuna logica di dominio
+   - SQL queries
+   - DB access
+   - no domain logic
 
-Ogni layer ha responsabilità **chiare e non sovrapposte**.
-
----
-
-## Migration e Seeding
-
-### Migration (obbligatorie)
-
-Le **migration** servono a:
-
-- versionare lo schema del database
-- rendere l’evoluzione del DB riproducibile e controllata
-
-Ogni modifica strutturale (tabelle, colonne, indici) è:
-
-- descritta in un file SQL numerato
-- applicata in ordine
-
-Questo elimina:
-
-- modifiche manuali
-- differenze tra ambienti
-- “non so come è nato questo campo”
-
-Le migration fanno **parte del servizio**, non di un servizio separato.
+Each layer has **clear, non-overlapping** responsibilities.
 
 ---
 
-### Seeding (dati iniziali)
+## Quick start
 
-Il **seeding** serve a:
+The service needs a reachable PostgreSQL database.
 
-- popolare il DB con dati iniziali
-- rendere immediato avvio e test
-- evitare configurazioni manuali
+```bash
+cp config.example.yaml config.yaml
+# edit DbURL in config.yaml with the parameters of your database
+RUN_MIGRATIONS=true RUN_SEEDING=true go run ./cmd/iot-nonna-core
+```
 
-Esempi:
+- The configuration file is `./config.yaml`; a different path can be set with the `CONFIG_PATH` variable.
+- `RUN_MIGRATIONS=true` applies the migrations at startup; `RUN_SEEDING=true` runs the seeding. Without these variables neither is run.
+- The API listens on port `3030`.
 
-- tipi di sensori noti
-- tipi di dispositivi noti
-- configurazione di test
+---
 
-Il seeding può essere:
+## Migrations and seeding
 
-- eseguito manualmente
-- o all’avvio in ambienti non produttivi
+### Migrations (required)
 
-## API Documentation
+Migrations are used to:
 
-La documentazione interattiva è disponibile via Swagger UI all'endpoint:
+- version the database schema
+- make the evolution of the DB reproducible and controlled
+
+Every structural change (tables, columns, indexes) is:
+
+- described in a numbered SQL file
+- applied in order
+
+This removes:
+
+- manual changes
+- differences between environments
+- "I don't know how this field came to be"
+
+Migrations are **part of the service**, not a separate service.
+
+---
+
+### Seeding (initial data)
+
+Seeding is used to:
+
+- populate the DB with initial data
+- make startup and testing immediate
+- avoid manual configuration
+
+Examples:
+
+- known sensor types
+- known device types
+- test configuration
+
+Seeding can be:
+
+- run manually
+- or run at startup in non-production environments
+
+## Planned
+
+- Aggregation and downsampling of readings: not implemented yet. The `/readings` endpoints return the raw readings, filtered by time range and maximum number of rows.
+
+---
+
+## API documentation
+
+Interactive documentation is available through Swagger UI at the endpoint:
+
 ```
 GET /swagger/index.html
 ```
-Permette di esplorare tutti gli endpoint, vedere i modelli di request/response
-e fare chiamate direttamente dal browser.
 
-Per rigenerare la documentazione dopo modifiche agli handler:
+It lets you explore all the endpoints, see the request/response models
+and make calls directly from the browser.
+
+To regenerate the documentation after changing the handlers:
 
 ```bash
 swag init -g cmd/iot-nonna-core/main.go
